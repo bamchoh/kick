@@ -4,6 +4,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
+)
+
+const (
+	CREATE_NEW_CONSOLE        = 0x00000010
+	CREATE_NEW_PROCESS_GROUPE = 0x00000200
 )
 
 func main() {
@@ -18,7 +24,10 @@ func main() {
 	} else {
 		cmd = exec.Command(args[0], args[1:]...)
 	}
-	// cmd.Stdout = os.Stdout
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		CreationFlags: syscall.CREATE_UNICODE_ENVIRONMENT | CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUPE,
+	}
+	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Start()
 	pid := make(chan int, 1)
